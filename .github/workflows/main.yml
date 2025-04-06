@@ -25,10 +25,10 @@ jobs:
 #
       - name: Run tests
         run: |
-          curl http://localhost:5001
+          curl http://localhost:5000
 
       - name: Stop application
-        run: kill -9 $(lsof -t -i :5001)
+        run: kill -9 $(lsof -t -i :5000)
 
 
 #
@@ -50,7 +50,7 @@ jobs:
       - name: wait application to be upload
         run: |
           sleep 5
-          curl http://localhost:5001
+          curl http://localhost:5000
 
       - name: Remove testing environment
         run: docker compose down -v
