@@ -8,15 +8,18 @@ app = Flask(__name__)
 
 # Database connection configurations (update with your MySQL RDS or Docker MySQL config)
 DB_CONFIG = {
-    'host': os.environ.get('DB_HOST', 'mysql'),  # Use 'mysql' for Docker service name or your RDS endpoint for AWS
-    'user': os.environ.get('DB_USER', 'root'),  # MySQL user
-    'password': os.environ.get('DB_PASSWORD', 'password'),  # MySQL password
+    'host': os.environ.get('DB_HOST', 'mysql-db'),
+    'user': os.environ.get('DB_USER', 'app_user'),  # MySQL user
+    # MySQL password
+    'password': os.environ.get('DB_USER_PASSWORD', 'app_pass'),
     'database': os.environ.get('DB_NAME', 'app_db')  # Database name
 }
+
 
 def get_db_connection():
     connection = pymysql.connect(**DB_CONFIG)
     return connection
+
 
 def create_table_if_not_exists():
     connection = get_db_connection()
@@ -33,6 +36,7 @@ def create_table_if_not_exists():
         connection.commit()
     finally:
         connection.close()
+
 
 @app.route('/')
 def home():
@@ -69,7 +73,8 @@ def home():
             entries = cursor.fetchall()
 
         previous_entries = [
-            {"hostname": row[0], "ip_address": row[1], "timestamp": row[2].strftime('%Y-%m-%d %H:%M:%S')}
+            {"hostname": row[0], "ip_address": row[1],
+                "timestamp": row[2].strftime('%Y-%m-%d %H:%M:%S')}
             for row in entries
         ]
 
@@ -80,12 +85,13 @@ def home():
             "current_entry": current_entry,
             "previous_entries": previous_entries
         })
-    
+
     except Exception as e:
         return jsonify({
             "message": f"No connection to the database. Showing current entry only. Error: {str(e)}",
             "current_entry": current_entry
         })
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

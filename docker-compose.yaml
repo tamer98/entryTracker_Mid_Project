@@ -3,14 +3,15 @@ services:
     image: mysql:5.7
     container_name: mysql-db
     environment:
-      - MYSQL_ROOT_PASSWORD:${DB_PASSWORD}
-      - MYSQL_DATABASE_NAME:${DB_NAME}
-      - MYSQL_USER:${DB_USER} 
-      - MYSQL_PASSWORD:${DB_USER_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER} 
+      - MYSQL_PASSWORD=${DB_USER_PASSWORD}
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
       interval: 10s
       timeout: 5s
+      start_period: 30s
       retries: 5
     volumes:
       - mysql_data:/var/lib/mysql
@@ -18,22 +19,22 @@ services:
       - app_network
       
   entrytracker:
-    image: entryTracker:latest
+    image: entrytracker:latest
     build:
      context: .
      dockerfile: Dockerfile
     container_name: application
     ports:
-      - "5000"
+      - "5000:5000"
     depends_on:
       mysql:
         condition: service_healthy
     environment:
-      - DB_HOST:${DB_HOST}   
-      - DB_PORT:${DB_PORT} 
-      - DB_USER:${DB_USER}    
-      - DB_PASSWORD:${DB_USER_PASSWORD}
-      - DB_NAME:${DB_NAME}
+      - DB_HOST=${DB_HOST}   
+      - DB_PORT=${DB_PORT} 
+      - DB_USER=${DB_USER}    
+      - DB_PASSWORD=${DB_USER_PASSWORD}
+      - DB_NAME=${DB_NAME}
     networks:
       - app_network
 
