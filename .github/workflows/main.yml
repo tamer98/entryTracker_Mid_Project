@@ -34,6 +34,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t entrytracker:latest .
+          docker ps -a
+          docker images
 
 #
       - name: Deploy testing environment
