@@ -28,7 +28,8 @@ jobs:
           curl http://localhost:5001
 
       - name: Stop application
-        run: pkill -f "next dev" || echo "No process found"
+        run: kill -9 $(lsof -t -i :5001)
+
 
 #
       - name: Build Docker image
