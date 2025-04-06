@@ -11,20 +11,46 @@ jobs:
       - name: Check out code and pull
         uses: actions/checkout@v2
 
-
+#
       - name: install dependencies and Build the application
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source venv/bin/activate #Sets the correct Python interpreter,correct dependencies,Updates environment variables
           pip install -r requirements.txt
           python app.py &
 
       - name: wait for server to be upload
         run: sleep 5
 
+#
       - name: Run tests
         run: |
           curl http://localhost:5000
+
+      - name: Stop application
+        run: pkill -f "next dev" || echo "No process found"
+
+#
+      - name: Build Docker image
+        run: |
+          docker build -t entrytracker:latest .
+
+#
+      - name: Deploy testing environment
+        run: docker compose up -d
+      
+      - name: Check running containers and existed images
+        run: |
+          docker ps -a
+          docker images
+        
+      - name: wait application to be upload
+        run: |
+          sleep 5
+          curl http://localhost:5000
+
+      - name: Remove testing environment
+        run: docker compose down -v
 
 
 
