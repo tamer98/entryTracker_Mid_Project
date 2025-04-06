@@ -35,8 +35,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t entrytracker:latest .
-          docker ps -a
-          docker images
+
 
 #
       - name: Deploy testing environment
@@ -50,11 +49,31 @@ jobs:
       - name: wait application to be upload
         run: |
           sleep 5
+          
+      - name: Run tests
+        run: |
           curl http://localhost:5000
 
       - name: Remove testing environment
         run: docker compose down -v
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.ECR_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.ECR_SECRET_KEY }}
+          aws-region: us-east-1
+        
+      - name: Authenticate Docker to AWS ECR
+        run: ${{ secrets.DOCKER_AUTENTICATES_AWS }}
+   
+      - name: Tag Docker image
+        run: docker tag demo-crm:latest 390844757505.dkr.ecr.ap-south-1.amazonaws.com/development/demo-crm:v1.0.0
+
+      
+#Publish to ECR repository
+      - name: Push Docker image to ECR
+        run: docker push 390844757505.dkr.ecr.ap-south-1.amazonaws.com/development/demo-crm:v1.0.0
 
 
 
