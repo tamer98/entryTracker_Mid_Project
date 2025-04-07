@@ -34,6 +34,7 @@ This project demonstrates a complete CI/CD pipeline for a simple 2-tier Python a
 ## Architecture
 
 **2-Tier application architecture Diagram**
+![Docker Mid Diagram drawio](https://github.com/user-attachments/assets/a796bd73-a667-414c-bebc-025a420d54b8)
 
 
 
