@@ -77,72 +77,53 @@ jobs:
 
 
 
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ap-south-1
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
-
-  #     - name: Build, Tag, and Push the Image to Amazon ECR
-  #       id: build-image
-  #       env:
-  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         ECR_REPOSITORY: entry-tracker
-  #         IMAGE_TAG: latest
-  #       run: |
-  #         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-  #         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
-  # CD:
-  #     needs: CI
-  #     runs-on: ubuntu-latest
-  #     timeout-minutes: 5
-  #     steps:
-  #       - name: Checkout
-  #         uses: actions/checkout@v3
+  CD:
+    needs: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check out code and pull
+        uses: actions/checkout@v2
+#
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.ECR_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.ECR_SECRET_KEY }}
+          aws-region: us-east-1
 
-  #       - name: Deploy to EC2
-  #         uses: easingthemes/ssh-deploy@main
-  #         env:
-  #             SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-  #             HOST: ${{ secrets.HOST_DNS }}
-  #             USER: ${{ secrets.USERNAME }}
-  #             TARGET: ${{ secrets.TARGET_DIR }}
+#
+      - name: Deploy to EC2
+        uses: easingthemes/ssh-deploy@main
+        with:
+            HOST: ${{ secrets.EC2_HOST_DNS }}
+            SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+            USER: ec2-user
+            SOURCE: .  # local dir you want to deploy
+            TARGET: /home/myapp  # remote dir you want to copy to (adjust as needed)
               
-  #             run: |
-  #               echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
-  #               ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
+
+            
+      - name: Run Docker on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          HOST: ${{ secrets.EC2_HOST_DNS }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          USER: ec2-user
+          run: |
+            pushd /home/myapp
+            #Pull the latest image from ECR
+            docker pull 569870184857.dkr.ecr.us-east-1.amazonaws.com/development/mid:latest
+            docker stop myapp || true
+            docker rm myapp || true
+            docker run -d --name app -p 5000:5000 myapp
+            #tests
+            curl http://localhost:5000
+
+            
+
                 
-  #               #install docker and docker compose 
-  #               sudo apt update
-  #               sudo apt install -y docker.io
-  #               sudo systemctl start docker
-  #               sudo systemctl enable docker
-  #               sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  #               sudo chmod +x /usr/local/bin/docker-compose
-  #               docker-compose --version
 
-  #               #Clean previous images and containers
-  #               docker system prune -f
-   
-  #               # Set environment variables
-  #               export DB_HOST=mysql
-  #               export DB_USER=root
-  #               export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-  #               export DB_NAME=entrytracker
-
-  #               #goes where files located
-  #               cd ${{ secrets.TARGET_DIR }}
-
-  #               # # Pull the latest image from ECR
-  #               docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-              
-  #               # #start application by running docker compose
-  #               docker compose up -d
       
