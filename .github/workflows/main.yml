@@ -101,8 +101,8 @@ jobs:
             REMOTE_HOST: ${{ secrets.EC2_HOST_DNS }}
             SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
             REMOTE_USER: ec2-user
-            SOURCE: .  # local dir you want to deploy
-            TARGET: /home/myapp  # remote dir you want to copy to (adjust as needed)
+            SOURCE: .  
+            TARGET: /home/myapp  
               
 
             
