@@ -37,16 +37,10 @@ This project demonstrates a complete CI/CD pipeline for a simple 2-tier Python a
 
 ![Docker Mid Diagram drawio](https://github.com/user-attachments/assets/a796bd73-a667-414c-bebc-025a420d54b8)
 
-
-
------------------------------------
-
-**AWS infrastructure architecture Diagram**
-
-
 -----------------------------------
 **Comprehensive diagram**
 
+![MidProject drawio](https://github.com/user-attachments/assets/d7c3565d-619a-4c5e-80a4-9ac2889e5b49)
 
 
 ## Technology Stack
