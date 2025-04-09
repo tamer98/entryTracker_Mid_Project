@@ -1,8 +1,8 @@
 name: EntryTracker CI/CD
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 jobs:
   CI:
     runs-on: ubuntu-latest
