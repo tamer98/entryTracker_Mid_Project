@@ -108,9 +108,9 @@ jobs:
       - name: Run Docker on EC2
         uses: appleboy/ssh-action@master
         with:
-          HOST: ${{ secrets.EC2_HOST_DNS }}
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          USER: ec2-user
+          host: ${{ secrets.EC2_HOST_DNS }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ec2-user
           run: |
             pushd /home/ec2-user/myapp
             #Pull the latest image from ECR
