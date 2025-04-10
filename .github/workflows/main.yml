@@ -111,7 +111,7 @@ jobs:
           host: ${{ secrets.EC2_HOST_DNS }}
           key: ${{ secrets.EC2_SSH_KEY }}
           username: ec2-user
-          run: |
+          script: |
             pushd /home/ec2-user/myapp
             #Pull the latest image from ECR
             docker pull 569870184857.dkr.ecr.us-east-1.amazonaws.com/development/mid:latest
