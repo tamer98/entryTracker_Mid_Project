@@ -107,7 +107,29 @@ jobs:
                 run: |
                   echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
                   ssh -o StrictHostKeyChecking=no -i private_key ${REMOTE_USER}@${REMOTE_HOST} '
-#
+
+
+                #install docker and docker compose 
+                sudo apt update
+                sudo apt install -y docker.io
+                sudo systemctl start docker
+                sudo systemctl enable docker
+                sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                sudo chmod +x /usr/local/bin/docker-compose
+                docker-compose --version
+
+                #Clean previous images and containers
+                docker system prune -f
+  
+
+                #goes where files located
+                cd ${{ secrets.TARGET_DIR }}
+
+                # # Pull the latest image from ECR
+                docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+              
+                # #start application by running docker compose
+                docker compose up -d
               
 
             
