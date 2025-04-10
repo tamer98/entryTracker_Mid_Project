@@ -1,8 +1,8 @@
 name: EntryTracker CI/CD
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 jobs:
   CI:
     runs-on: ubuntu-latest
@@ -94,11 +94,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.ECR_SECRET_KEY }}
           aws-region: us-east-1
 
-#
+# ------
       - name: Deploy to EC2
         uses: easingthemes/ssh-deploy@main
         with:
-            REMOTE_HOST: ${{ secrets.EC2_HOST_DNS }}
+            REMOTE_HOST: ec2-54-165-5-11.compute-1.amazonaws.com #${{ secrets.EC2_HOST_DNS }}
             SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
             REMOTE_USER: ec2-user
             SOURCE: .  
@@ -106,21 +106,21 @@ jobs:
               
 
             
-      - name: Run Docker on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          HOST: ${{ secrets.EC2_HOST_DNS }}
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          USER: ec2-user
-          run: |
-            pushd /home/myapp
-            #Pull the latest image from ECR
-            docker pull 569870184857.dkr.ecr.us-east-1.amazonaws.com/development/mid:latest
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name app -p 5000:5000 myapp
-            #tests
-            curl http://localhost:5000
+      # - name: Run Docker on EC2
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     HOST: ${{ secrets.EC2_HOST_DNS }}
+      #     SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+      #     USER: ec2-user
+      #     run: |
+      #       pushd /home/myapp
+      #       #Pull the latest image from ECR
+      #       docker pull 569870184857.dkr.ecr.us-east-1.amazonaws.com/development/mid:latest
+      #       docker stop myapp || true
+      #       docker rm myapp || true
+      #       docker run -d --name app -p 5000:5000 myapp
+      #       #tests
+      #       curl http://localhost:5000
 
             
 
